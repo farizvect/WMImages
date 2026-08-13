@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="description" content="Editor watermark gambar yang sepenuhnya berjalan di perangkat Anda." />
+  <title>MW Images — Local Watermark Studio</title>
+  <link rel="stylesheet" href="./src/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="MW Images home"><span class="brand-mark">MW</span><span>IMAGES</span></a>
+
+  </header>
+
+  <div id="onboarding" class="onboarding" hidden>
+    <div class="onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+      <div class="onboarding-top"><span class="eyebrow">WELCOME / MW IMAGES</span><button id="onboardingClose" class="onboarding-close" aria-label="Tutup onboarding">×</button></div>
+      <h2 id="onboardingTitle">Watermark tanpa upload.</h2>
+      <p class="onboarding-lead">Semua proses berjalan di browser perangkatmu. Ini cara memakai studio ini.</p>
+      <div class="onboarding-slides" aria-live="polite">
+        <div class="onboarding-slide active" data-onboarding-step="0"><b>01 / 04</b><strong>Masukkan gambar</strong><span>Drag & drop atau klik <em>Pilih gambar</em>. File tidak dikirim ke server.</span></div>
+        <div class="onboarding-slide" data-onboarding-step="1"><b>02 / 04</b><strong>Tulis atau pakai logo</strong><span>Pilih tab <em>Teks</em> untuk watermark multiline, atau <em>Logo</em> untuk file PNG/JPG/WebP.</span></div>
+        <div class="onboarding-slide" data-onboarding-step="2"><b>03 / 04</b><strong>Pilih style</strong><span><em>Single</em> bisa posisi + rotasi. <em>Diagonal bands</em> hanya rotasi. Style lain otomatis memenuhi canvas.</span></div>
+        <div class="onboarding-slide" data-onboarding-step="3"><b>04 / 04</b><strong>Atur & download</strong><span>Opacity, ukuran, warna, gap, format, dan kualitas. Preview dan export memakai resolusi asli.</span></div>
+      </div>
+      <div class="onboarding-dots" aria-label="Progress onboarding">
+        <button class="onboarding-dot active" data-onboarding-dot="0" aria-label="Step 1"></button><button class="onboarding-dot" data-onboarding-dot="1" aria-label="Step 2"></button><button class="onboarding-dot" data-onboarding-dot="2" aria-label="Step 3"></button><button class="onboarding-dot" data-onboarding-dot="3" aria-label="Step 4"></button>
+      </div>
+      <div class="onboarding-footer"><span id="onboardingProgress">Step 1 dari 4</span><div class="onboarding-actions"><button id="onboardingBack" class="button ghost" hidden>Kembali</button><button id="onboardingNext" class="button primary">Lanjut</button><button id="onboardingStart" class="button primary" hidden>Mulai pakai</button></div></div>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <section class="workspace" aria-label="Editor gambar">
+      <div class="workspace-head">
+        <div><span class="eyebrow">01 / CANVAS</span><h1>Watermark studio</h1></div>
+        <div class="file-actions">
+          <label class="button secondary" for="imageInput">Pilih gambar</label>
+          <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+          <button id="clearButton" class="button ghost" disabled>Hapus</button>
+        </div>
+      </div>
+
+      <div id="stageWrap" class="stage-wrap">
+        <canvas id="stage" aria-label="Preview gambar dengan watermark"></canvas>
+        <label id="dropzone" class="dropzone" for="imageInput">
+          <span class="drop-icon">＋</span>
+          <strong>Taruh gambar di sini</strong>
+          <span>atau klik untuk memilih · PNG, JPG, WEBP</span>
+          <small>File tetap di browser ini. Tidak pernah dikirim ke server.</small>
+        </label>
+      </div>
+      <div class="canvas-meta"><span id="imageMeta">Belum ada gambar</span><span id="zoomMeta">Preview otomatis</span></div>
+    </section>
+
+    <aside class="controls" aria-label="Pengaturan watermark">
+      <div class="control-head"><span class="eyebrow">02 / WATERMARK</span><button id="resetButton" class="text-button">Reset</button></div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="text" role="tab">Teks</button>
+        <button class="tab" data-tab="image" role="tab">Logo</button>
+      </div>
+
+      <div id="textPanel" class="panel active">
+        <label class="field"><span>Isi watermark</span><textarea id="watermarkText" rows="4" maxlength="500">© MW IMAGES</textarea></label>
+        <div class="field-grid">
+          <label class="field"><span>Font</span><select id="fontFamily"><option value="ui-monospace, SFMono-Regular, Menlo, monospace">Mono</option><option value="Arial, sans-serif">Sans</option><option value="Georgia, serif">Serif</option><option value="Impact, sans-serif">Impact</option></select></label>
+          <label class="field"><span>Ukuran</span><input id="fontSize" type="number" min="10" max="300" value="54" /></label>
+        </div>
+        <div class="field-grid">
+          <label class="field"><span>Warna</span><span class="color-field"><input id="color" type="color" value="#ffffff" /><output id="colorValue">#FFFFFF</output></span></label>
+          <label class="field"><span>Gaya</span><select id="fontWeight"><option value="400">Regular</option><option value="600" selected>Semi bold</option><option value="800">Bold</option></select></label>
+        </div>
+      </div>
+
+      <div id="imagePanel" class="panel">
+        <label id="logoPicker" class="logo-picker" for="logoInput"><span>＋ Pilih logo / watermark</span><small>PNG transparan direkomendasikan</small></label>
+        <input id="logoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+        <div id="logoInfo" class="logo-info">Belum ada logo</div>
+        <label class="field"><span>Skala logo <output id="logoScaleOut">25%</output></span><input id="logoScale" type="range" min="5" max="80" value="25" /></label>
+      </div>
+
+      <div class="divider"></div>
+      <div class="field"><span>Style</span><div class="style-grid" aria-label="Pilih style watermark">
+        <button class="style-option active" data-style="single"><span class="style-preview sp-single"></span><span>Single</span></button>
+        <button class="style-option" data-style="tiled"><span class="style-preview sp-tiled"></span><span>Tiled</span></button>
+        <button class="style-option" data-style="rows"><span class="style-preview sp-rows"></span><span>Text rows</span></button>
+        <button class="style-option" data-style="bands"><span class="style-preview sp-bands"></span><span>Diagonal bands</span></button>
+        <button class="style-option" data-style="dense"><span class="style-preview sp-dense"></span><span>Dense grid</span></button>
+      </div></div>
+
+      <label class="field context-control" data-for="rows" hidden><span>Jarak baris <output id="rowGapOut">24</output>px</span><input id="rowGap" type="range" min="0" max="200" value="24" /></label>
+      <label class="field context-control" data-for="bands" hidden><span>Jarak pola <output id="patternGapOut">60</output>%</span><input id="patternGap" type="range" min="10" max="200" value="60" /></label>
+
+      <div class="divider"></div>
+      <label class="field"><span>Opacity <output id="opacityOut">72%</output></span><input id="opacity" type="range" min="5" max="100" value="72" /></label>
+      <div id="rotationControls" class="field"><span>Rotasi <output id="rotationOut">0°</output></span><input id="rotation" type="range" min="-180" max="180" value="0" /></div>
+
+      <div id="positionControls" class="field"><span>Posisi</span><div class="position-grid" aria-label="Posisi watermark">
+        <button data-position="top-left">↖</button><button data-position="top-center">↑</button><button data-position="top-right">↗</button>
+        <button data-position="center-left">←</button><button data-position="center" class="active">•</button><button data-position="center-right">→</button>
+        <button data-position="bottom-left">↙</button><button data-position="bottom-center">↓</button><button data-position="bottom-right">↘</button>
+      </div></div>
+
+      <div class="divider"></div>
+      <div class="field-grid export-grid">
+        <label class="field"><span>Format</span><select id="format"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WEBP</option></select></label>
+        <label class="field"><span>Kualitas <output id="qualityOut">92%</output></span><input id="quality" type="range" min="50" max="100" value="92" /></label>
+      </div>
+      <button id="downloadButton" class="button primary" disabled>Download gambar</button>
+      <p class="local-note">Pemrosesan berlangsung melalui Canvas API di perangkat ini.</p>
+    </aside>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="./src/app.mjs?v=20260813-onboarding-steps"></script>
+</body>
+</html>
