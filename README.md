@@ -6,7 +6,7 @@ A privacy-focused image watermark editor that runs entirely in your browser. No 
 
 ```sh
 cd /home/fariz/codes/mw-images
-npm start
+python3 -m http.server 4173
 ```
 
 Open `http://localhost:4173`. The server can also bind to `0.0.0.0` for access over Tailscale, for example `http://100.107.247.13:4173`.
@@ -60,12 +60,12 @@ A four-step onboarding guide explains the workflow on the first visit. It is sto
 - Image decoding, rendering, and export happen locally through the Canvas API
 - No `fetch`, `XMLHttpRequest`, remote assets, analytics, or backend
 - Image files never leave your device
-- No project dependencies are required
+- No package manager or project dependencies are required
 
 ## Tests
 
 ```sh
-npm test
+node --test tests/*.test.mjs
 ```
 
 The test suite covers:
@@ -81,7 +81,6 @@ src/app.mjs             Browser state, Canvas rendering, and interactions
 src/editor-core.mjs     Pure layout and watermark helpers
 src/styles.css          Responsive terminal-style UI
  tests/                  Node built-in test suite
-docs/plans/             Feature implementation plans
 ```
 
 ## License
