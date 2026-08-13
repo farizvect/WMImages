@@ -44,6 +44,13 @@ test('bands layout honors gap: wider gap means fewer bands', () => {
   assert.ok(tight.length > loose.length);
 });
 
+test('bands layout changes perpendicular spacing with gap', () => {
+  const tight = buildBandsLayout(1000, 600, 240, 60, 10);
+  const loose = buildBandsLayout(1000, 600, 240, 60, 160);
+  const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  assert.ok(distance(tight[0], tight[1]) < distance(loose[0], loose[1]));
+});
+
 test('bands layout extends beyond both horizontal canvas edges', () => {
   const marks = buildBandsLayout(1000, 600, 240, 60, 48);
   assert.ok(marks.some(mark => mark.x < 0));

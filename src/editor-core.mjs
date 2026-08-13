@@ -86,9 +86,13 @@ export function buildBandsLayout(width, height, markWidth, markHeight, gap = nul
   const diagonal = Math.hypot(width, height);
   const step = Math.max(1, markHeight + (gap ?? markHeight * 1.2));
   const count = Math.ceil((diagonal * 2) / step) + 2;
+  // Bands run along `rotation`; rows must be spaced on the perpendicular axis.
+  const perpendicularX = -Math.sin(radians);
+  const perpendicularY = Math.cos(radians);
   for (let i = 0; i < count; i++) {
-    const centerX = -diagonal / 2 + i * step * Math.cos(radians);
-    const centerY = diagonal / 2 + i * step * Math.sin(radians);
+    const offset = -diagonal + i * step;
+    const centerX = width / 2 + offset * perpendicularX - markWidth / 2;
+    const centerY = height / 2 + offset * perpendicularY - markHeight / 2;
     marks.push({ x: centerX, y: centerY, rotation, text: null, lineIndex: 0 });
   }
   return marks.slice(0, MAX_MARKS);
