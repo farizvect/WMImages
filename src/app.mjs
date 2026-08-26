@@ -7,7 +7,7 @@ const els = Object.fromEntries(['imageInput','logoInput','dropzone','clearButton
 const defaults = { mode:'text', position:'center', customPosition:null, opacity:72, rotation:0, style:'single', rowGap:24, patternGap:60 };
 const state = { ...defaults, source:null, sourceName:'image', logo:null, logoName:'', dragging:false };
 const styleButtons = [...document.querySelectorAll('.style-option')];
-const STYLE_LABELS = { single:'drag watermark', tiled:'pola otomatis', rows:'baris teks penuh', bands:'jalur diagonal', dense:'grid rapat' };
+const STYLE_LABELS = { single:'drag watermark', tiled:'pola otomatis', rows:'baris teks penuh', bands:'jalur diagonal' };
 const onboarding = $('onboarding');
 const onboardingClose = $('onboardingClose');
 const onboardingStart = $('onboardingStart');
@@ -84,6 +84,8 @@ function drawScene(drawCtx=ctx){
     const layout=buildStyleLayout({
       style, width:canvas.width, height:canvas.height, markWidth:mark.width, markHeight:mark.height, lines,
       gap:style==='bands' ? mark.height*fraction : Number(els.rowGap.value),
+      gapX:style==='tiled' ? mark.width*fraction : undefined,
+      gapY:style==='tiled' ? mark.height*fraction : undefined,
       rotation,
     });
     layout.forEach(item=>drawMark(drawCtx,item.x,item.y,mark,item.text??lines[0],item.rotation));
@@ -97,9 +99,9 @@ function setTab(mode){ state.mode=mode; document.querySelectorAll('.tab').forEac
 function setStyle(style){
   state.style=normalizeStyle(style); styleButtons.forEach(b=>b.classList.toggle('active',b.dataset.style===state.style));
   els.positionControls.hidden=state.style!=='single';
-  els.rotationControls.hidden=!['single','bands'].includes(state.style);
+  els.rotationControls.hidden=!['single','bands','tiled'].includes(state.style);
   els.rowGap.closest('.context-control').hidden=state.style!=='rows';
-  els.patternGap.closest('.context-control').hidden=state.style!=='bands';
+  els.patternGap.closest('.context-control').hidden=!['bands','tiled'].includes(state.style);
   if(state.source) els.zoomMeta.textContent=`${els.zoomMeta.textContent.split('·')[0].trim()} · ${state.style==='single'?'drag watermark':STYLE_LABELS[state.style]}`;
   render();
 }

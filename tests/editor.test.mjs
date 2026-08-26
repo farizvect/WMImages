@@ -12,7 +12,7 @@ import {
   normalizeStyle,
   buildRowsLayout,
   buildBandsLayout,
-  buildDenseLayout,
+  buildTiledLayout,
   buildStyleLayout,
   resolveStyleRotation,
 } from '../src/editor-core.mjs';
@@ -58,40 +58,38 @@ test('bands layout extends beyond both horizontal canvas edges', () => {
   assert.ok(marks.every(mark => mark.rotation === -30));
 });
 
-test('dense layout contains more marks than standard tiled layout', () => {
-  const dense = buildDenseLayout(1000, 600, 180, 50);
-  const tiled = buildRepeatedPositions(1000, 600, 180, 50, 99, 75);
-  assert.ok(dense.length > tiled.length);
-});
-
 test('style dispatcher returns rows with alternating multiline text', () => {
   const layout = buildStyleLayout({ style:'rows', width:800, height:500, markWidth:300, markHeight:50, lines:['PRIVATE','DO NOT COPY'], gap:20, rotation:0 });
   assert.equal(layout[0].text, 'PRIVATE');
   assert.equal(layout[1].text, 'DO NOT COPY');
 });
 
-test('rotation is locked except for single and diagonal bands', () => {
+test('rotation applies to single, tiled, and diagonal bands', () => {
   assert.equal(resolveStyleRotation('single', 15), 15);
+  assert.equal(resolveStyleRotation('tiled', 45), 45);
   assert.equal(resolveStyleRotation('bands', 10), -20);
-  assert.equal(resolveStyleRotation('tiled', 45), 0);
   assert.equal(resolveStyleRotation('rows', 45), 0);
-  assert.equal(resolveStyleRotation('dense', 45), 0);
 });
 
-test('tiled layout routes through the style dispatcher', () => {
-  const layout = buildStyleLayout({ style:'tiled', width:1000, height:600, markWidth:180, markHeight:50, lines:['X'], gap:60, rotation:0 });
+test('tiled layout routes through the style dispatcher and applies rotation', () => {
+  const layout = buildStyleLayout({ style:'tiled', width:1000, height:600, markWidth:180, markHeight:50, lines:['X'], gap:60, rotation:30 });
   assert.ok(layout.length >= 12);
-  assert.ok(layout.every(mark => mark.rotation === 0));
+  assert.ok(layout.every(mark => mark.rotation === 30));
   assert.ok(layout.some(mark => mark.x < 0));
 });
 
-test('dense layout routes through the style dispatcher', () => {
-  const layout = buildStyleLayout({ style:'dense', width:1000, height:600, markWidth:180, markHeight:50, lines:['X'], gap:60, rotation:0 });
-  assert.ok(layout.length > 20);
+test('tiled layout honors pattern gap: wider gap means fewer marks', () => {
+  const tight = buildStyleLayout({ style:'tiled', width:1000, height:600, markWidth:180, markHeight:50, lines:['X'], gap:10, rotation:0 });
+  const loose = buildStyleLayout({ style:'tiled', width:1000, height:600, markWidth:180, markHeight:50, lines:['X'], gap:200, rotation:0 });
+  assert.ok(tight.length > loose.length);
+});
+
+test('dense is no longer a supported style', () => {
+  assert.equal(normalizeStyle('dense'), 'single');
 });
 
 test('generated layouts are capped at 2000 instances', () => {
-  assert.ok(buildDenseLayout(100000, 100000, 1, 1).length <= 2000);
+  assert.ok(buildTiledLayout(100000, 100000, 1, 1).length <= 2000);
 });
 
 test('watermark units scale consistently with export width', () => {

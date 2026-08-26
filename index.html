@@ -22,7 +22,7 @@
       <div class="onboarding-slides" aria-live="polite">
         <div class="onboarding-slide active" data-onboarding-step="0"><b>01 / 04</b><strong>Masukkan gambar</strong><span>Drag & drop atau klik <em>Pilih gambar</em>. File tidak dikirim ke server.</span></div>
         <div class="onboarding-slide" data-onboarding-step="1"><b>02 / 04</b><strong>Tulis atau pakai logo</strong><span>Pilih tab <em>Teks</em> untuk watermark multiline, atau <em>Logo</em> untuk file PNG/JPG/WebP.</span></div>
-        <div class="onboarding-slide" data-onboarding-step="2"><b>03 / 04</b><strong>Pilih style</strong><span><em>Single</em> bisa posisi + rotasi. <em>Diagonal bands</em> hanya rotasi. Style lain otomatis memenuhi canvas.</span></div>
+        <div class="onboarding-slide" data-onboarding-step="2"><b>03 / 04</b><strong>Pilih style</strong><span><em>Single</em> bisa posisi + rotasi. <em>Tiled</em> dan <em>Diagonal bands</em> bisa rotasi + jarak pola. <em>Text rows</em> mengisi baris penuh.</span></div>
         <div class="onboarding-slide" data-onboarding-step="3"><b>04 / 04</b><strong>Atur & download</strong><span>Opacity, ukuran, warna, gap, format, dan kualitas. Preview dan export memakai resolusi asli.</span></div>
       </div>
       <div class="onboarding-dots" aria-label="Progress onboarding">
@@ -88,11 +88,10 @@
         <button class="style-option" data-style="tiled"><span class="style-preview sp-tiled"></span><span>Tiled</span></button>
         <button class="style-option" data-style="rows"><span class="style-preview sp-rows"></span><span>Text rows</span></button>
         <button class="style-option" data-style="bands"><span class="style-preview sp-bands"></span><span>Diagonal bands</span></button>
-        <button class="style-option" data-style="dense"><span class="style-preview sp-dense"></span><span>Dense grid</span></button>
       </div></div>
 
       <label class="field context-control" data-for="rows" hidden><span>Jarak baris <output id="rowGapOut">24</output>px</span><input id="rowGap" type="range" min="0" max="200" value="24" /></label>
-      <label class="field context-control" data-for="bands" hidden><span>Jarak pola <output id="patternGapOut">60</output>%</span><input id="patternGap" type="range" min="10" max="200" value="60" /></label>
+      <label class="field context-control" data-for="tiled bands" hidden><span>Jarak pola <output id="patternGapOut">60</output>%</span><input id="patternGap" type="range" min="10" max="200" value="60" /></label>
 
       <div class="divider"></div>
       <label class="field"><span>Opacity <output id="opacityOut">72%</output></span><input id="opacity" type="range" min="5" max="100" value="72" /></label>
@@ -115,6 +114,6 @@
     </aside>
   </main>
   <div id="toast" class="toast" role="status"></div>
-  <script type="module" src="./src/app.mjs?v=20260813-export-scale"></script>
+  <script type="module" src="./src/app.mjs?v=20260813-no-dense-tiled"></script>
 </body>
 </html>

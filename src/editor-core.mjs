@@ -44,7 +44,7 @@ export function makeExportName(originalName = 'image', format = 'png') {
   return `${base}-watermarked.${ext}`;
 }
 
-export const WATERMARK_STYLES = ['single', 'tiled', 'rows', 'bands', 'dense'];
+export const WATERMARK_STYLES = ['single', 'tiled', 'rows', 'bands'];
 
 export function normalizeStyle(style) {
   return WATERMARK_STYLES.includes(style) ? style : 'single';
@@ -52,7 +52,7 @@ export function normalizeStyle(style) {
 
 export function resolveStyleRotation(style, sliderRotation = 0) {
   const normalized = normalizeStyle(style);
-  if (normalized === 'single') return sliderRotation;
+  if (normalized === 'single' || normalized === 'tiled') return sliderRotation;
   if (normalized === 'bands') return -30 + sliderRotation;
   return 0;
 }
@@ -98,29 +98,28 @@ export function buildBandsLayout(width, height, markWidth, markHeight, gap = nul
   return marks.slice(0, MAX_MARKS);
 }
 
-export function buildTiledLayout(width, height, markWidth, markHeight, gapX = null, gapY = null) {
+export function buildTiledLayout(width, height, markWidth, markHeight, gapX = null, gapY = null, rotation = 0) {
   const gx = gapX ?? markWidth * 0.55;
   const gy = gapY ?? markHeight * 0.75;
   const points = buildRepeatedPositions(width, height, markWidth, markHeight, gx, gy, MAX_MARKS);
-  return points.map((point, index) => ({
-    x: point.x, y: point.y, rotation: 0, text: null, lineIndex: index % 2,
-  }));
+  const radians = (rotation * Math.PI) / 180;
+  const cos = Math.cos(radians), sin = Math.sin(radians);
+  const cx = width / 2, cy = height / 2;
+  return points.map((point, index) => {
+    const dx = point.x + markWidth / 2 - cx;
+    const dy = point.y + markHeight / 2 - cy;
+    return {
+      x: cx + dx * cos - dy * sin - markWidth / 2,
+      y: cy + dx * sin + dy * cos - markHeight / 2,
+      rotation, text: null, lineIndex: index % 2,
+    };
+  });
 }
 
-export function buildDenseLayout(width, height, markWidth, markHeight, gapX = null, gapY = null) {
-  const gx = gapX ?? markWidth * 0.22;
-  const gy = gapY ?? markHeight * 0.35;
-  const points = buildRepeatedPositions(width, height, markWidth, markHeight, gx, gy, MAX_MARKS);
-  return points.map((point, index) => ({
-    x: point.x, y: point.y, rotation: 0, text: null, lineIndex: index % 2,
-  }));
-}
-
-export function buildStyleLayout({ style, width, height, markWidth, markHeight, lines, gapX, gapY, gap, rotation }) {
+export function buildStyleLayout({ style, width, height, markWidth, markHeight, lines, gap, gapX, gapY, rotation }) {
   const normalized = normalizeStyle(style);
   if (normalized === 'rows') return buildRowsLayout(width, height, markWidth, markHeight, lines, gap);
   if (normalized === 'bands') return buildBandsLayout(width, height, markWidth, markHeight, gap, rotation);
-  if (normalized === 'tiled') return buildTiledLayout(width, height, markWidth, markHeight, gapX, gapY);
-  if (normalized === 'dense') return buildDenseLayout(width, height, markWidth, markHeight, gapX, gapY);
+  if (normalized === 'tiled') return buildTiledLayout(width, height, markWidth, markHeight, gapX ?? gap, gapY ?? gap, rotation);
   return [];
 }

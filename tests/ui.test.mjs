@@ -6,8 +6,9 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../src/app.mjs', import.meta.url), 'utf8');
 
 test('style picker exposes every supported preset', () => {
-  for (const style of ['single', 'tiled', 'rows', 'bands', 'dense']) assert.match(html, new RegExp(`data-style="${style}"`));
+  for (const style of ['single', 'tiled', 'rows', 'bands']) assert.match(html, new RegExp(`data-style="${style}"`));
 });
+test('dense grid is removed', () => assert.doesNotMatch(html, /data-style="dense"/));
 test('watermark text supports multiple lines', () => assert.match(html, /<textarea[^>]+id="watermarkText"/));
 test('repeat checkbox is removed in favor of styles', () => assert.doesNotMatch(html, /id="repeat"/));
 test('contextual gap controls exist', () => { assert.match(html, /id="rowGap"/); assert.match(html, /id="patternGap"/); });

@@ -25,23 +25,22 @@ Open `http://localhost:4173`. The server can also bind to `0.0.0.0` for access o
 - Editable logo scale
 - Transparent PNG recommended
 
-### Five watermark styles
+### Four watermark styles
 
 | Style | Position | Rotation | Special control |
 |---|---|---|---|
 | **Single** | 9 presets + drag | Fully adjustable | — |
-| **Tiled** | Fixed layout | Locked | — |
+| **Tiled** | Fixed layout | Fully adjustable | **Pattern gap** |
 | **Text rows** | Fixed layout | Locked | **Row gap** |
 | **Diagonal bands** | Fixed layout | Adjustable from -30° | **Pattern gap** |
-| **Dense grid** | Fixed layout | Locked | — |
 
 Notes:
 
 - Only **Single** supports manual positioning and dragging.
-- Rotation is available only for **Single** and **Diagonal bands**.
+- Rotation is available for **Single**, **Tiled**, and **Diagonal bands**.
 - Diagonal bands use a base angle of -30°; the rotation slider adds an offset to it.
 - **Row gap** controls spacing between text rows.
-- **Pattern gap** controls spacing between diagonal bands.
+- **Pattern gap** controls spacing for Tiled and Diagonal bands.
 - Layout generation is capped at 2,000 instances per render to prevent browser freezes.
 
 ### Export
@@ -71,7 +70,7 @@ node --test tests/*.test.mjs
 The test suite covers:
 
 - `tests/editor.test.mjs` — multiline parsing, style layout generators, coverage, 2,000-instance cap, dispatcher, and utility behavior
-- `tests/ui.test.mjs` — five style buttons, multiline textarea, contextual controls, onboarding, and privacy UI contract
+- `tests/ui.test.mjs` — four style buttons, multiline textarea, contextual controls, onboarding, and privacy UI contract
 
 ## Project structure
 
