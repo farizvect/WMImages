@@ -3,7 +3,7 @@ import { clamp, getContainRect, getWatermarkRect, resolvePosition, buildStyleLay
 const $ = id => document.getElementById(id);
 const canvas = $('stage');
 const ctx = canvas.getContext('2d');
-const els = Object.fromEntries(['imageInput','logoInput','dropzone','clearButton','resetButton','downloadButton','watermarkText','fontFamily','fontSize','color','colorValue','fontWeight','opacity','opacityOut','rotation','rotationOut','format','quality','qualityOut','logoScale','logoScaleOut','logoInfo','imageMeta','zoomMeta','stageWrap','toast','positionControls','rotationControls','rowGap','rowGapOut','patternGap','patternGapOut'].map(id => [id,$(id)]));
+const els = Object.fromEntries(['imageInput','logoInput','dropzone','clearButton','resetButton','downloadButton','watermarkText','fontFamily','fontSize','color','colorValue','fontWeight','opacity','opacityOut','rotation','rotationOut','format','exportScale','quality','qualityOut','logoScale','logoScaleOut','logoInfo','imageMeta','zoomMeta','stageWrap','toast','positionControls','rotationControls','rowGap','rowGapOut','patternGap','patternGapOut'].map(id => [id,$(id)]));
 const defaults = { mode:'text', position:'center', customPosition:null, opacity:72, rotation:0, style:'single', rowGap:24, patternGap:60 };
 const state = { ...defaults, source:null, sourceName:'image', logo:null, logoName:'', dragging:false };
 const styleButtons = [...document.querySelectorAll('.style-option')];
@@ -107,7 +107,22 @@ function reset(){ Object.assign(state,defaults); setTab('text'); els.watermarkTe
 function clear(){ state.source=null;state.sourceName='image';state.customPosition=null;ctx.clearRect(0,0,canvas.width,canvas.height);canvas.width=300;canvas.height=150;canvas.style.width='';canvas.style.height='';els.dropzone.classList.remove('hidden');els.clearButton.disabled=true;els.downloadButton.disabled=true;els.imageMeta.textContent='Belum ada gambar';els.zoomMeta.textContent='Preview otomatis';els.imageInput.value=''; }
 function pointerPoint(e){ const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)}; }
 function canDragAt(e){ if(!state.source||state.style!=='single'||(state.mode==='image'&&!state.logo))return false; const p=pointerPoint(e),m=markMetrics(),pos=currentPosition(m); return p.x>=pos.x&&p.x<=pos.x+m.width&&p.y>=pos.y&&p.y<=pos.y+m.height; }
-function exportImage(){ if(!state.source)return; const old={w:canvas.width,h:canvas.height,sw:canvas.style.width,sh:canvas.style.height}; canvas.width=state.source.naturalWidth;canvas.height=state.source.naturalHeight;drawScene(); const format=els.format.value,quality=Number(els.quality.value)/100; canvas.toBlob(blob=>{ if(!blob){showToast('Format tidak didukung browser');return} const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=makeExportName(state.sourceName,format);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);canvas.width=old.w;canvas.height=old.h;canvas.style.width=old.sw;canvas.style.height=old.sh;drawScene();showToast('Gambar berhasil dibuat'); },`image/${format}`,quality); }
+function exportImage(){
+  if(!state.source)return;
+  const old={w:canvas.width,h:canvas.height,sw:canvas.style.width,sh:canvas.style.height};
+  const scale=Number(els.exportScale.value)/100;
+  const format=els.format.value,quality=Number(els.quality.value)/100;
+  canvas.width=Math.max(1,Math.round(state.source.naturalWidth*scale));
+  canvas.height=Math.max(1,Math.round(state.source.naturalHeight*scale));
+  drawScene();
+  canvas.toBlob(blob=>{
+    if(!blob){showToast('Format tidak didukung browser');return}
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=makeExportName(state.sourceName,format);a.click();
+    showToast(`${(blob.size/1024/1024).toFixed(2)} MB · ${canvas.width}×${canvas.height}`);
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    canvas.width=old.w;canvas.height=old.h;canvas.style.width=old.sw;canvas.style.height=old.sh;drawScene();
+  },`image/${format}`,quality);
+}
 
 els.imageInput.addEventListener('change',e=>acceptSource(e.target.files[0])); els.logoInput.addEventListener('change',e=>acceptLogo(e.target.files[0]));
 ['dragenter','dragover'].forEach(type=>els.dropzone.addEventListener(type,e=>{e.preventDefault();els.dropzone.classList.add('drag')}));['dragleave','drop'].forEach(type=>els.dropzone.addEventListener(type,e=>{e.preventDefault();els.dropzone.classList.remove('drag')}));els.dropzone.addEventListener('drop',e=>acceptSource(e.dataTransfer.files[0]));

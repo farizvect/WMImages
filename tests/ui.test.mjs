@@ -11,6 +11,7 @@ test('style picker exposes every supported preset', () => {
 test('watermark text supports multiple lines', () => assert.match(html, /<textarea[^>]+id="watermarkText"/));
 test('repeat checkbox is removed in favor of styles', () => assert.doesNotMatch(html, /id="repeat"/));
 test('contextual gap controls exist', () => { assert.match(html, /id="rowGap"/); assert.match(html, /id="patternGap"/); });
+test('export has scale control and defaults to jpeg', () => { assert.match(html, /id="exportScale"/); assert.match(html, /<option value="jpeg" selected>JPG<\/option>/); });
 test('rotation and position controls are wrapped for contextual visibility', () => { assert.match(html, /id="rotationControls"/); assert.match(html, /id="positionControls"/); });
 test('local privacy badge is removed from topbar', () => assert.doesNotMatch(html, /LOCAL ONLY/));
 test('onboarding has first-visit storage and close actions', () => {

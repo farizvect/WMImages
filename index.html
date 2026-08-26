@@ -106,14 +106,15 @@
 
       <div class="divider"></div>
       <div class="field-grid export-grid">
-        <label class="field"><span>Format</span><select id="format"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WEBP</option></select></label>
-        <label class="field"><span>Kualitas <output id="qualityOut">92%</output></span><input id="quality" type="range" min="50" max="100" value="92" /></label>
+        <label class="field"><span>Format</span><select id="format"><option value="jpeg" selected>JPG</option><option value="png">PNG</option><option value="webp">WEBP</option></select></label>
+        <label class="field"><span>Resolusi</span><select id="exportScale"><option value="100" selected>100% (asli)</option><option value="75">75%</option><option value="50">50%</option><option value="25">25%</option></select></label>
       </div>
+      <label class="field"><span>Kualitas <output id="qualityOut">92%</output></span><input id="quality" type="range" min="50" max="100" value="92" /></label>
       <button id="downloadButton" class="button primary" disabled>Download gambar</button>
       <p class="local-note">Pemrosesan berlangsung melalui Canvas API di perangkat ini.</p>
     </aside>
   </main>
   <div id="toast" class="toast" role="status"></div>
-  <script type="module" src="./src/app.mjs?v=20260813-onboarding-steps"></script>
+  <script type="module" src="./src/app.mjs?v=20260813-export-scale"></script>
 </body>
 </html>
